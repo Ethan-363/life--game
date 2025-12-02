@@ -1,6 +1,6 @@
 import React, { Suspense, useEffect, useRef, useState, useLayoutEffect, useMemo } from 'react';
 import { Canvas, useThree, useFrame, useLoader } from '@react-three/fiber';
-import { OrbitControls, Environment, ContactShadows, useGLTF, Center, Html, Stars, Grid, Sky, useProgress } from '@react-three/drei';
+import { OrbitControls, ContactShadows, useGLTF, Center, Html, Stars, Grid, Sky, useProgress } from '@react-three/drei';
 import * as THREE from 'three';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
@@ -473,6 +473,8 @@ const DefaultMaleCharacter = () => {
   );
 };
 
+export { DynamicModel, DefaultMaleCharacter, DefaultCityEnvironment };
+
 interface ModelProps {
   modelData: ModelData | null;
   type: 'character' | 'environment';
@@ -640,19 +642,19 @@ const ThreeScene: React.FC<ThreeSceneProps> = ({
   return (
     <div className="w-full h-full bg-gradient-to-b from-gray-900 to-black">
       <Canvas shadows camera={{ position: [0, 1.3, 5.5], fov: 42 }} dpr={[1, 2]}>
-        {/* Lights - Optimized shadows */}
-        <ambientLight intensity={0.6} color="#ffffff" />
+        {/* Lights - Optimized shadows - Increased intensity to compensate for removed Environment */}
+        <ambientLight intensity={0.8} color="#ffffff" />
         <spotLight 
           position={[5, 10, 5]} 
           angle={0.25} 
           penumbra={1} 
-          intensity={1.5} 
+          intensity={2.0} 
           castShadow 
           shadow-mapSize={1024} 
           shadow-bias={-0.0001}
         />
-        <pointLight position={[-5, 2, -5]} intensity={0.5} color="#06b6d4" />
-        <pointLight position={[5, 2, -5]} intensity={0.5} color="#8b5cf6" />
+        <pointLight position={[-5, 2, -5]} intensity={0.8} color="#06b6d4" />
+        <pointLight position={[5, 2, -5]} intensity={0.8} color="#8b5cf6" />
 
         {/* Environment / Background */}
         <ErrorBoundary 
@@ -717,7 +719,7 @@ const ThreeScene: React.FC<ThreeSceneProps> = ({
           dampingFactor={0.05}
         />
         
-        <Environment preset="city" />
+        {/* Environment removed to fix Vercel loading issue */}
       </Canvas>
     </div>
   );
