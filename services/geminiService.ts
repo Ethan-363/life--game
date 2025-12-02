@@ -1,14 +1,23 @@
 import { GoogleGenAI } from "@google/genai";
 import { CharacterStats } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
 export const generateCharacterBackstory = async (
   name: string,
   role: string,
   stats: CharacterStats
 ): Promise<string> => {
+  // Retrieve API Key exclusively from process.env as per guidelines.
+  // Using (process.env as any) to handle potential missing Node types in the client environment.
+  const apiKey = (process.env as any).API_KEY;
+  
+  if (!apiKey) {
+    console.warn("API Key is missing.");
+    return "Neural link offline. API Key required for bio generation.";
+  }
+
   try {
+    const ai = new GoogleGenAI({ apiKey });
+    
     const prompt = `
       Create a short, immersive, and mysterious backstory (max 100 words) for a video game character with the following details:
       Name: ${name}
