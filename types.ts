@@ -1,3 +1,4 @@
+
 export type StatKey = 'intelligence' | 'vitality' | 'charisma' | 'skill' | 'wealth' | 'luck';
 
 export type Language = 'zh' | 'en' | 'es' | 'hi' | 'fr' | 'ar' | 'pt';
@@ -45,6 +46,15 @@ export const INITIAL_HISTORY: StatHistory = {
   wealth: [],
   luck: [],
 };
+
+// Global JSX Type Definition for React Three Fiber
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      [elemName: string]: any;
+    }
+  }
+}
 
 // Progressive Level Calculation
 // Level 1: Requires 20 XP to complete.

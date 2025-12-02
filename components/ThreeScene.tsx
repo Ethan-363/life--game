@@ -1,21 +1,12 @@
 import React, { Suspense, useEffect, useRef, useState, useLayoutEffect, useMemo } from 'react';
 import { Canvas, useThree, useFrame, useLoader } from '@react-three/fiber';
-import { OrbitControls, Environment, ContactShadows, useGLTF, Center, Html, Stars, Grid, Sky, useProgress } from '@react-three/drei';
+import { OrbitControls, Environment, ContactShadows, useGLTF, Center, Html, Stars, Grid, Sky, useProgress, Lightformer } from '@react-three/drei';
 import * as THREE from 'three';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import { StatKey, CharacterStats, getLevelInfo } from '../types';
 import { Brain, Heart, Crown, Zap, Coins, Clover } from 'lucide-react';
 import { ModelData } from '../App';
-
-// Fix for missing JSX Intrinsic Elements for React Three Fiber
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      [elemName: string]: any;
-    }
-  }
-}
 
 // --- Error Boundary ---
 
@@ -461,12 +452,12 @@ const DefaultMaleCharacter = () => {
   );
 };
 
-interface ModelProps {
+export interface ModelProps {
   modelData: ModelData | null;
   type: 'character' | 'environment';
 }
 
-const DynamicModel: React.FC<ModelProps> = ({ modelData, type }) => {
+export const DynamicModel: React.FC<ModelProps> = ({ modelData, type }) => {
   // Manual Error State to force Boundary fallback
   const [error, setError] = useState<string | null>(null);
   
@@ -705,7 +696,15 @@ const ThreeScene: React.FC<ThreeSceneProps> = ({
           dampingFactor={0.05}
         />
         
-        <Environment preset="city" />
+        {/* Procedural Environment using Lightformers instead of external HDR preset */}
+        <Environment resolution={256}>
+          <group rotation={[-Math.PI / 3, 0, 1]}>
+            <Lightformer form="circle" intensity={4} rotation-x={Math.PI / 2} position={[0, 5, -9]} scale={2} />
+            <Lightformer form="circle" intensity={2} rotation-y={Math.PI / 2} position={[-5, 1, -1]} scale={2} />
+            <Lightformer form="circle" intensity={2} rotation-y={Math.PI / 2} position={[-5, -1, -1]} scale={2} />
+            <Lightformer form="rect" intensity={2} rotation-y={-Math.PI / 2} position={[10, 1, 0]} scale={[10, 1, 1]} />
+          </group>
+        </Environment>
       </Canvas>
     </div>
   );
