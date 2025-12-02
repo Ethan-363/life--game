@@ -12,19 +12,7 @@ import { ModelData } from '../App';
 declare global {
   namespace JSX {
     interface IntrinsicElements {
-      group: any;
-      mesh: any;
-      boxGeometry: any;
-      cylinderGeometry: any;
-      sphereGeometry: any;
-      planeGeometry: any;
-      meshStandardMaterial: any;
-      directionalLight: any;
-      orthographicCamera: any;
-      ambientLight: any;
-      spotLight: any;
-      pointLight: any;
-      primitive: any;
+      [elemName: string]: any;
     }
   }
 }
