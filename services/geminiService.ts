@@ -1,6 +1,9 @@
 import { GoogleGenAI } from "@google/genai";
 import { CharacterStats } from "../types";
 
+// Explicitly declare process to avoid TS errors when @types/node is missing
+declare const process: any;
+
 export const generateCharacterBackstory = async (
   name: string,
   role: string,

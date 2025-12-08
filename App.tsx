@@ -339,7 +339,7 @@ const App: React.FC = () => {
   const currentLabels: Record<string, string> = {};
   const t = TRANSLATIONS[language];
   (Object.keys(stats) as StatKey[]).forEach(key => {
-    currentLabels[key] = t[key];
+    currentLabels[key] = (t as any)[key];
   });
 
   return (

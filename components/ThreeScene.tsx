@@ -512,9 +512,9 @@ export const DynamicModel: React.FC<ModelProps> = ({ modelData, type }) => {
   let object: THREE.Group | THREE.Object3D | null = null;
   
   if (modelData.ext === 'fbx') {
-    object = useLoader(FBXLoader, modelData.url);
+    object = useLoader(FBXLoader, modelData.url) as THREE.Group;
   } else if (modelData.ext === 'obj') {
-    object = useLoader(OBJLoader, modelData.url);
+    object = useLoader(OBJLoader, modelData.url) as THREE.Group;
   } else {
     // Default to GLB/GLTF
     const gltf = useGLTF(modelData.url) as any;
