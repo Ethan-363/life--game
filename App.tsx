@@ -28,14 +28,52 @@ export interface ModelData {
   ext: string; // 'glb' | 'gltf' | 'fbx' | 'obj'
 }
 
+const STORAGE_KEYS = {
+  STATS: 'nexus_stats',
+  HISTORY: 'nexus_history',
+  LANGUAGE: 'nexus_language',
+  SETTINGS: 'nexus_settings'
+};
+
 const App: React.FC = () => {
-  // State
-  const [stats, setStats] = useState<CharacterStats>(INITIAL_STATS);
-  const [history, setHistory] = useState<StatHistory>(INITIAL_HISTORY);
-  const [language, setLanguage] = useState<Language>('zh');
+  // State Initialization with LocalStorage lazy loading
+  const [stats, setStats] = useState<CharacterStats>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.STATS);
+      return saved ? JSON.parse(saved) : INITIAL_STATS;
+    } catch (e) {
+      console.error("Failed to load stats", e);
+      return INITIAL_STATS;
+    }
+  });
+
+  const [history, setHistory] = useState<StatHistory>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.HISTORY);
+      return saved ? JSON.parse(saved) : INITIAL_HISTORY;
+    } catch (e) {
+      console.error("Failed to load history", e);
+      return INITIAL_HISTORY;
+    }
+  });
+
+  const [language, setLanguage] = useState<Language>(() => {
+    const saved = localStorage.getItem(STORAGE_KEYS.LANGUAGE);
+    return (saved as Language) || 'zh';
+  });
+
   const [activeStat, setActiveStat] = useState<StatKey | null>(null);
-  const [show3DStats, setShow3DStats] = useState(true);
-  const [showDailyLog, setShowDailyLog] = useState(true);
+  
+  // Load UI settings
+  const [show3DStats, setShow3DStats] = useState(() => {
+    const saved = localStorage.getItem(STORAGE_KEYS.SETTINGS);
+    return saved ? JSON.parse(saved).show3DStats : true;
+  });
+  
+  const [showDailyLog, setShowDailyLog] = useState(() => {
+    const saved = localStorage.getItem(STORAGE_KEYS.SETTINGS);
+    return saved ? JSON.parse(saved).showDailyLog : true;
+  });
   
   const [characterModel, setCharacterModel] = useState<ModelData | null>(null);
   const [backgroundModel, setBackgroundModel] = useState<ModelData | null>(null);
@@ -46,6 +84,23 @@ const App: React.FC = () => {
 
   const [levelUpEvent, setLevelUpEvent] = useState<LevelUpEvent | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  // Persistence Effects
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.STATS, JSON.stringify(stats));
+  }, [stats]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.HISTORY, JSON.stringify(history));
+  }, [history]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.LANGUAGE, language);
+  }, [language]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify({ show3DStats, showDailyLog }));
+  }, [show3DStats, showDailyLog]);
 
   // Load default models from IndexedDB on startup
   useEffect(() => {
@@ -152,10 +207,13 @@ const App: React.FC = () => {
     updateStat(key, currentVal + amount, { amount, reason });
   };
 
-  const handleReset = () => {
-    if (window.confirm('Are you sure you want to reset all data?')) {
+  const handleReset = async () => {
+    if (window.confirm('Are you sure you want to reset all data? This will clear local records.')) {
       setStats(INITIAL_STATS);
       setHistory(INITIAL_HISTORY);
+      localStorage.removeItem(STORAGE_KEYS.STATS);
+      localStorage.removeItem(STORAGE_KEYS.HISTORY);
+      // We don't necessarily clear language or model defaults unless requested separately
     }
   };
 

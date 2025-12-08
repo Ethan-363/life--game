@@ -1,0 +1,22 @@
+{
+  "name": "人生游戏 Nexus Forge",
+  "short_name": "Nexus Forge",
+  "description": "A next-generation 3D character attribute panel.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://aistudiocdn.com/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://aistudiocdn.com/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

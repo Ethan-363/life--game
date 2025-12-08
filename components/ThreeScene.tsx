@@ -1,6 +1,6 @@
 import React, { Suspense, useEffect, useRef, useState, useLayoutEffect, useMemo } from 'react';
 import { Canvas, useThree, useFrame, useLoader } from '@react-three/fiber';
-import { OrbitControls, ContactShadows, useGLTF, Center, Html, Stars, Grid, Sky, useProgress } from '@react-three/drei';
+import { OrbitControls, useGLTF, Center, Html, Stars, Grid, Sky, useProgress } from '@react-three/drei';
 import * as THREE from 'three';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
@@ -225,7 +225,7 @@ const StatPanel: React.FC<StatPanelProps> = ({ statKey, value, label, colorClass
 
 // --- Default City Environment ---
 
-const DefaultCityEnvironment = () => {
+export const DefaultCityEnvironment = () => {
   const buildings = useMemo(() => {
     const items = [];
     // Create a grid of buildings
@@ -261,12 +261,12 @@ const DefaultCityEnvironment = () => {
       <Sky distance={450000} sunPosition={[100, 40, 100]} inclination={0.6} azimuth={0.1} />
       
       {/* Sunlight */}
-      <directionalLight position={[100, 40, 100]} intensity={1.5} castShadow shadow-mapSize={2048}>
+      <directionalLight position={[100, 40, 100]} intensity={1.5}>
         <orthographicCamera attach="shadow-camera" args={[-50, 50, 50, -50]} />
       </directionalLight>
 
       {/* Pavement Ground - At y=0 */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
         <planeGeometry args={[200, 200]} />
         <meshStandardMaterial color="#475569" roughness={0.9} />
       </mesh>
@@ -284,7 +284,7 @@ const DefaultCityEnvironment = () => {
 
       {buildings.map((b, i) => (
         <group key={i} position={b.position}>
-           <mesh castShadow receiveShadow>
+           <mesh>
              <boxGeometry args={b.size} />
              <meshStandardMaterial 
                 color={b.color} 
@@ -307,7 +307,7 @@ const DefaultCityEnvironment = () => {
 
 // --- Default Realistic Male Character Model ---
 
-const DefaultMaleCharacter = () => {
+export const DefaultMaleCharacter = () => {
   // Realistic Materials
   const skinMaterial = <meshStandardMaterial color="#eac086" roughness={0.5} />; // Warm beige skin
   const shirtMaterial = <meshStandardMaterial color="#374151" roughness={0.9} />; // Dark Grey tight T-shirt
@@ -319,7 +319,7 @@ const DefaultMaleCharacter = () => {
     <group dispose={null}>
       {/* --- LEGS --- */}
       {/* Hips / Pelvis */}
-      <mesh position={[0, 1.05, 0]} castShadow receiveShadow>
+      <mesh position={[0, 1.05, 0]}>
         <boxGeometry args={[0.55, 0.35, 0.35]} />
         {pantsMaterial}
       </mesh>
@@ -327,22 +327,22 @@ const DefaultMaleCharacter = () => {
       {/* Left Leg */}
       <group position={[-0.28, 0.1, 0]}>
         {/* Thigh (Jeans) */}
-        <mesh position={[0, 0.4, 0]} rotation={[0, 0, 0.03]} castShadow receiveShadow>
+        <mesh position={[0, 0.4, 0]} rotation={[0, 0, 0.03]}>
           <cylinderGeometry args={[0.18, 0.15, 0.9, 16]} />
           {pantsMaterial}
         </mesh>
         {/* Knee (Jeans) */}
-        <mesh position={[0.02, -0.1, 0]} castShadow receiveShadow>
+        <mesh position={[0.02, -0.1, 0]}>
            <sphereGeometry args={[0.16]} />
            {pantsMaterial}
         </mesh>
         {/* Calf (Jeans) */}
-        <mesh position={[0.05, -0.65, 0]} castShadow receiveShadow>
+        <mesh position={[0.05, -0.65, 0]}>
           <cylinderGeometry args={[0.15, 0.12, 0.9, 16]} />
           {pantsMaterial}
         </mesh>
         {/* Boot */}
-        <mesh position={[0.05, -1.15, 0.1]} castShadow receiveShadow>
+        <mesh position={[0.05, -1.15, 0.1]}>
           <boxGeometry args={[0.18, 0.15, 0.45]} />
           {shoesMaterial}
         </mesh>
@@ -351,22 +351,22 @@ const DefaultMaleCharacter = () => {
       {/* Right Leg */}
       <group position={[0.28, 0.1, 0]}>
         {/* Thigh (Jeans) */}
-        <mesh position={[0, 0.4, 0]} rotation={[0, 0, -0.03]} castShadow receiveShadow>
+        <mesh position={[0, 0.4, 0]} rotation={[0, 0, -0.03]}>
           <cylinderGeometry args={[0.18, 0.15, 0.9, 16]} />
           {pantsMaterial}
         </mesh>
         {/* Knee (Jeans) */}
-        <mesh position={[-0.02, -0.1, 0]} castShadow receiveShadow>
+        <mesh position={[-0.02, -0.1, 0]}>
            <sphereGeometry args={[0.16]} />
            {pantsMaterial}
         </mesh>
         {/* Calf (Jeans) */}
-        <mesh position={[-0.05, -0.65, 0]} castShadow receiveShadow>
+        <mesh position={[-0.05, -0.65, 0]}>
           <cylinderGeometry args={[0.15, 0.12, 0.9, 16]} />
           {pantsMaterial}
         </mesh>
         {/* Boot */}
-        <mesh position={[-0.05, -1.15, 0.1]} castShadow receiveShadow>
+        <mesh position={[-0.05, -1.15, 0.1]}>
           <boxGeometry args={[0.18, 0.15, 0.45]} />
           {shoesMaterial}
         </mesh>
@@ -374,19 +374,19 @@ const DefaultMaleCharacter = () => {
 
       {/* --- TORSO --- */}
       {/* Waist (Shirt) */}
-      <mesh position={[0, 1.45, 0]} castShadow receiveShadow>
+      <mesh position={[0, 1.45, 0]}>
          <cylinderGeometry args={[0.28, 0.27, 0.6, 16]} />
          {shirtMaterial}
       </mesh>
       
       {/* Chest (Shirt) - Muscular */}
-      <mesh position={[0, 2.0, 0]} castShadow receiveShadow>
+      <mesh position={[0, 2.0, 0]}>
          <cylinderGeometry args={[0.42, 0.32, 0.6, 16]} /> 
          {shirtMaterial}
       </mesh>
       
       {/* Neck (Skin) */}
-      <mesh position={[0, 2.35, 0]} castShadow receiveShadow>
+      <mesh position={[0, 2.35, 0]}>
          <cylinderGeometry args={[0.12, 0.14, 0.2, 16]} />
          {skinMaterial}
       </mesh>
@@ -394,17 +394,17 @@ const DefaultMaleCharacter = () => {
       {/* --- HEAD --- */}
       <group position={[0, 2.65, 0]}>
          {/* Face */}
-         <mesh castShadow receiveShadow>
+         <mesh>
            <boxGeometry args={[0.28, 0.35, 0.32]} />
            {skinMaterial}
          </mesh>
          {/* Hair Top */}
-         <mesh position={[0, 0.2, 0]} castShadow receiveShadow>
+         <mesh position={[0, 0.2, 0]}>
            <boxGeometry args={[0.3, 0.15, 0.34]} />
            {hairMaterial}
          </mesh>
          {/* Hair Back */}
-         <mesh position={[0, 0.0, -0.18]} castShadow receiveShadow>
+         <mesh position={[0, 0.0, -0.18]}>
            <boxGeometry args={[0.3, 0.3, 0.05]} />
            {hairMaterial}
          </mesh>
@@ -414,7 +414,7 @@ const DefaultMaleCharacter = () => {
       {/* Left Arm */}
       <group position={[-0.55, 2.15, 0]}>
          {/* Shoulder (Shirt) */}
-         <mesh castShadow receiveShadow>
+         <mesh>
            <sphereGeometry args={[0.2]} />
            {shirtMaterial}
          </mesh>
@@ -424,17 +424,17 @@ const DefaultMaleCharacter = () => {
             {shirtMaterial}
          </mesh>
          {/* Upper Arm (Skin) */}
-         <mesh position={[0.02, -0.5, 0]} rotation={[0, 0, 0.1]} castShadow receiveShadow>
+         <mesh position={[0.02, -0.5, 0]} rotation={[0, 0, 0.1]}>
             <cylinderGeometry args={[0.15, 0.13, 0.5, 16]} />
             {skinMaterial}
          </mesh>
          {/* Forearm (Skin) */}
-         <mesh position={[0.08, -1.0, 0.1]} rotation={[0.2, 0, 0.1]} castShadow receiveShadow>
+         <mesh position={[0.08, -1.0, 0.1]} rotation={[0.2, 0, 0.1]}>
             <cylinderGeometry args={[0.13, 0.11, 0.6, 16]} />
             {skinMaterial}
          </mesh>
          {/* Hand */}
-         <mesh position={[0.12, -1.4, 0.15]} rotation={[0.2, 0, 0.1]} castShadow receiveShadow>
+         <mesh position={[0.12, -1.4, 0.15]} rotation={[0.2, 0, 0.1]}>
             <boxGeometry args={[0.12, 0.15, 0.15]} />
             {skinMaterial}
          </mesh>
@@ -443,7 +443,7 @@ const DefaultMaleCharacter = () => {
       {/* Right Arm */}
       <group position={[0.55, 2.15, 0]}>
          {/* Shoulder (Shirt) */}
-         <mesh castShadow receiveShadow>
+         <mesh>
            <sphereGeometry args={[0.2]} />
            {shirtMaterial}
          </mesh>
@@ -453,17 +453,17 @@ const DefaultMaleCharacter = () => {
             {shirtMaterial}
          </mesh>
          {/* Upper Arm (Skin) */}
-         <mesh position={[-0.02, -0.5, 0]} rotation={[0, 0, -0.1]} castShadow receiveShadow>
+         <mesh position={[-0.02, -0.5, 0]} rotation={[0, 0, -0.1]}>
             <cylinderGeometry args={[0.15, 0.13, 0.5, 16]} />
             {skinMaterial}
          </mesh>
          {/* Forearm (Skin) */}
-         <mesh position={[-0.08, -1.0, 0.1]} rotation={[0.2, 0, -0.1]} castShadow receiveShadow>
+         <mesh position={[-0.08, -1.0, 0.1]} rotation={[0.2, 0, -0.1]}>
             <cylinderGeometry args={[0.13, 0.11, 0.6, 16]} />
             {skinMaterial}
          </mesh>
          {/* Hand */}
-         <mesh position={[-0.12, -1.4, 0.15]} rotation={[0.2, 0, -0.1]} castShadow receiveShadow>
+         <mesh position={[-0.12, -1.4, 0.15]} rotation={[0.2, 0, -0.1]}>
             <boxGeometry args={[0.12, 0.15, 0.15]} />
             {skinMaterial}
          </mesh>
@@ -473,14 +473,12 @@ const DefaultMaleCharacter = () => {
   );
 };
 
-export { DynamicModel, DefaultMaleCharacter, DefaultCityEnvironment };
-
 interface ModelProps {
   modelData: ModelData | null;
   type: 'character' | 'environment';
 }
 
-const DynamicModel: React.FC<ModelProps> = ({ modelData, type }) => {
+export const DynamicModel: React.FC<ModelProps> = ({ modelData, type }) => {
   // Manual Error State to force Boundary fallback
   const [error, setError] = useState<string | null>(null);
   
@@ -519,7 +517,7 @@ const DynamicModel: React.FC<ModelProps> = ({ modelData, type }) => {
     object = useLoader(OBJLoader, modelData.url);
   } else {
     // Default to GLB/GLTF
-    const gltf = useGLTF(modelData.url);
+    const gltf = useGLTF(modelData.url) as any;
     object = gltf.scene;
   }
   
@@ -536,8 +534,6 @@ const DynamicModel: React.FC<ModelProps> = ({ modelData, type }) => {
       if ((obj as THREE.Mesh).isMesh) {
         meshCount++;
         const mesh = obj as THREE.Mesh;
-        mesh.castShadow = true;
-        mesh.receiveShadow = true;
         mesh.frustumCulled = false; 
         
         // Ensure material is visible
@@ -641,7 +637,7 @@ const ThreeScene: React.FC<ThreeSceneProps> = ({
 
   return (
     <div className="w-full h-full bg-gradient-to-b from-gray-900 to-black">
-      <Canvas shadows camera={{ position: [0, 1.3, 5.5], fov: 42 }} dpr={[1, 2]}>
+      <Canvas camera={{ position: [0, 1.3, 5.5], fov: 42 }} dpr={[1, 2]}>
         {/* Lights - Optimized shadows - Increased intensity to compensate for removed Environment */}
         <ambientLight intensity={0.8} color="#ffffff" />
         <spotLight 
@@ -649,9 +645,6 @@ const ThreeScene: React.FC<ThreeSceneProps> = ({
           angle={0.25} 
           penumbra={1} 
           intensity={2.0} 
-          castShadow 
-          shadow-mapSize={1024} 
-          shadow-bias={-0.0001}
         />
         <pointLight position={[-5, 2, -5]} intensity={0.8} color="#06b6d4" />
         <pointLight position={[5, 2, -5]} intensity={0.8} color="#8b5cf6" />
@@ -678,9 +671,6 @@ const ThreeScene: React.FC<ThreeSceneProps> = ({
           </Suspense>
         </ErrorBoundary>
         
-        {/* Ground Shadows - Optimized */}
-        <ContactShadows resolution={512} scale={20} blur={2.5} opacity={0.5} far={10} color="#000000" />
-
         {/* 3D Stat Panels */}
         {showStats && statKeys.map((key, index) => {
           const angle = (index / statKeys.length) * Math.PI * 2;
