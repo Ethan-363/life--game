@@ -3,7 +3,7 @@ import { CharacterStats, StatHistory, StatKey, Language, StatRecord, getLevelInf
 import { 
   Settings, Upload, RefreshCw, X, Plus, Minus, History, 
   Brain, Heart, Crown, Zap, Coins, Clover, ChevronLeft, ChevronRight, Save,
-  Eye, EyeOff, Trophy, Check, Trash2, AlertTriangle, Star, PartyPopper, Calendar
+  Eye, EyeOff, Trophy, Check, Trash2, AlertTriangle, Star, PartyPopper, Calendar, Download, FileJson
 } from 'lucide-react';
 import { LevelUpEvent } from '../App';
 
@@ -31,6 +31,7 @@ export const TRANSLATIONS = {
     save: '记录',
     current: '当前数值',
     modelSettings: '模型设置',
+    dataSettings: '数据管理',
     showStats: '显示3D属性',
     hideStats: '隐藏3D属性',
     visibility: '界面显示',
@@ -52,6 +53,8 @@ export const TRANSLATIONS = {
     defaultSaved: '已设为默认',
     clearDefault: '恢复初始',
     defaultCleared: '已恢复',
+    backupData: '备份数据 (导出)',
+    restoreData: '恢复数据 (导入)',
   },
   en: {
     intelligence: 'Intelligence',
@@ -75,6 +78,7 @@ export const TRANSLATIONS = {
     save: 'Record',
     current: 'Current Value',
     modelSettings: 'Model Settings',
+    dataSettings: 'Data Management',
     showStats: 'Show 3D Stats',
     hideStats: 'Hide 3D Stats',
     visibility: 'Interface Visibility',
@@ -96,6 +100,8 @@ export const TRANSLATIONS = {
     defaultSaved: 'Saved',
     clearDefault: 'Reset Default',
     defaultCleared: 'Reset',
+    backupData: 'Backup Data (Export)',
+    restoreData: 'Restore Data (Import)',
   },
   es: {
     intelligence: 'Inteligencia',
@@ -119,6 +125,7 @@ export const TRANSLATIONS = {
     save: 'Guardar',
     current: 'Valor Actual',
     modelSettings: 'Ajustes de Modelo',
+    dataSettings: 'Gestión de Datos',
     showStats: 'Mostrar Estadísticas 3D',
     hideStats: 'Ocultar Estadísticas 3D',
     visibility: 'Visibilidad',
@@ -140,6 +147,8 @@ export const TRANSLATIONS = {
     defaultSaved: 'Guardado',
     clearDefault: 'Borrar Default',
     defaultCleared: 'Borrado',
+    backupData: 'Copia de Seguridad',
+    restoreData: 'Restaurar Datos',
   },
   fr: {
     intelligence: 'Intelligence',
@@ -163,6 +172,7 @@ export const TRANSLATIONS = {
     save: 'Enregistrer',
     current: 'Valeur Actuelle',
     modelSettings: 'Paramètres du Modèle',
+    dataSettings: 'Gestion des Données',
     showStats: 'Afficher Stats 3D',
     hideStats: 'Masquer Stats 3D',
     visibility: 'Visibilité',
@@ -184,6 +194,8 @@ export const TRANSLATIONS = {
     defaultSaved: 'Sauvegardé',
     clearDefault: 'Réinitialiser',
     defaultCleared: 'Réinitialisé',
+    backupData: 'Sauvegarder',
+    restoreData: 'Restaurer',
   },
   hi: {
     intelligence: 'बुद्धि (Intelligence)',
@@ -207,6 +219,7 @@ export const TRANSLATIONS = {
     save: 'सहेजें',
     current: 'वर्तमान मूल्य',
     modelSettings: 'मॉडल सेटिंग्स',
+    dataSettings: 'डेटा प्रबंधन',
     showStats: '3D आँकड़े दिखाएँ',
     hideStats: '3D आँकड़े छिपाएँ',
     visibility: 'दृश्यता',
@@ -228,6 +241,8 @@ export const TRANSLATIONS = {
     defaultSaved: 'सहेजा गया',
     clearDefault: 'डिफ़ॉल्ट हटाएं',
     defaultCleared: 'हटा दिया',
+    backupData: 'डेटा बैकअप',
+    restoreData: 'डेटा पुनर्स्थापित',
   },
   ar: {
     intelligence: 'الذكاء',
@@ -251,6 +266,7 @@ export const TRANSLATIONS = {
     save: 'حفظ',
     current: 'القيمة الحالية',
     modelSettings: 'إعدادات النموذج',
+    dataSettings: 'إدارة البيانات',
     showStats: 'إظهار الإحصائيات 3D',
     hideStats: 'إخفاء الإحصائيات 3D',
     visibility: 'الرؤية',
@@ -272,6 +288,8 @@ export const TRANSLATIONS = {
     defaultSaved: 'تم الحفظ',
     clearDefault: 'مسح الافتراضي',
     defaultCleared: 'تم المسح',
+    backupData: 'نسخ احتياطي',
+    restoreData: 'استعادة البيانات',
   },
   pt: {
     intelligence: 'Inteligência',
@@ -295,6 +313,7 @@ export const TRANSLATIONS = {
     save: 'Salvar',
     current: 'Valor Atual',
     modelSettings: 'Configurações de Modelo',
+    dataSettings: 'Gerenciamento de Dados',
     showStats: 'Mostrar Stats 3D',
     hideStats: 'Ocultar Stats 3D',
     visibility: 'Visibilidade',
@@ -316,6 +335,8 @@ export const TRANSLATIONS = {
     defaultSaved: 'Salvo',
     clearDefault: 'Limpar Padrão',
     defaultCleared: 'Limpo',
+    backupData: 'Backup de Dados',
+    restoreData: 'Restaurar Dados',
   }
 };
 
@@ -799,6 +820,8 @@ interface InterfaceProps {
   onSaveAsDefault: (type: 'character' | 'background') => Promise<void>;
   onClearDefault: (type: 'character' | 'background') => Promise<void>;
   onErrorClose?: () => void;
+  onExportData: () => void;
+  onImportData: (file: File) => void;
 }
 
 const Interface = ({
@@ -822,7 +845,9 @@ const Interface = ({
   onCloseLevelUp,
   onSaveAsDefault,
   onClearDefault,
-  onErrorClose
+  onErrorClose,
+  onExportData,
+  onImportData
 }: InterfaceProps) => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
@@ -831,6 +856,7 @@ const Interface = ({
   const t = TRANSLATIONS[language];
   const charInputRef = useRef<HTMLInputElement>(null);
   const bgInputRef = useRef<HTMLInputElement>(null);
+  const importDataRef = useRef<HTMLInputElement>(null);
 
   // Reset closing state when active stat changes from outside
   useEffect(() => {
@@ -937,6 +963,24 @@ const Interface = ({
               </div>
             </div>
             
+            <div className="h-px bg-gray-700/50" />
+            
+            {/* Data Management (NEW) */}
+            <div>
+               <label className="text-[10px] text-gray-400 uppercase font-bold mb-2 block">{t.dataSettings}</label>
+               <div className="flex gap-2 mb-2">
+                 <RippleButton onClick={onExportData} className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-xs text-green-400 border border-green-900/30 transition-colors">
+                   <Download size={12} /> {t.backupData}
+                 </RippleButton>
+               </div>
+               <div className="flex gap-2">
+                 <input type="file" ref={importDataRef} className="hidden" accept=".json" onChange={(e) => e.target.files?.[0] && onImportData(e.target.files[0])} />
+                 <RippleButton onClick={() => importDataRef.current?.click()} className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-xs text-orange-400 border border-orange-900/30 transition-colors">
+                   <FileJson size={12} /> {t.restoreData}
+                 </RippleButton>
+               </div>
+            </div>
+
             <div className="h-px bg-gray-700/50" />
             
             {/* Uploads & Defaults */}

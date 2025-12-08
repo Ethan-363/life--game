@@ -85,6 +85,20 @@ const App: React.FC = () => {
   const [levelUpEvent, setLevelUpEvent] = useState<LevelUpEvent | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
+  // --- MOBILE PERSISTENCE CHECK ---
+  useEffect(() => {
+    // Request persistent storage to prevent OS from clearing data on low disk space
+    if (navigator.storage && navigator.storage.persist) {
+      navigator.storage.persist().then((persistent) => {
+        if (persistent) {
+          console.log("Storage will not be cleared except by explicit user action");
+        } else {
+          console.log("Storage may be cleared by the UA under storage pressure.");
+        }
+      });
+    }
+  }, []);
+
   // Persistence Effects
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.STATS, JSON.stringify(stats));
@@ -264,6 +278,59 @@ const App: React.FC = () => {
     }
   };
 
+  // --- DATA BACKUP & RESTORE ---
+  
+  const handleExportData = () => {
+    const data = {
+      version: 1,
+      timestamp: Date.now(),
+      stats,
+      history,
+      settings: { show3DStats, showDailyLog },
+      language
+    };
+    
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `nexus_backup_${new Date().toISOString().slice(0,10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImportData = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const result = e.target?.result as string;
+        const data = JSON.parse(result);
+        
+        if (data.version && data.stats && data.history) {
+          if (window.confirm("Overwrite current data with this backup?")) {
+             setStats(data.stats);
+             setHistory(data.history);
+             if (data.settings) {
+               setShow3DStats(data.settings.show3DStats);
+               setShowDailyLog(data.settings.showDailyLog);
+             }
+             if (data.language) setLanguage(data.language);
+             alert("Data restored successfully!");
+          }
+        } else {
+          throw new Error("Invalid backup format");
+        }
+      } catch (err) {
+        console.error("Import failed", err);
+        setErrorMsg("Failed to import data: Invalid file format.");
+        setTimeout(() => setErrorMsg(null), 3000);
+      }
+    };
+    reader.readAsText(file);
+  };
+
   const handleStatSelect = (key: StatKey) => {
     setActiveStat(key);
   };
@@ -318,6 +385,8 @@ const App: React.FC = () => {
           onSaveAsDefault={handleSaveAsDefault}
           onClearDefault={handleClearDefault}
           onErrorClose={() => setErrorMsg(null)}
+          onExportData={handleExportData}
+          onImportData={handleImportData}
         />
       </div>
     </div>
